@@ -1,33 +1,32 @@
 
 import os
-import json
-from telegram.ext import Updater, MessageHandler, Filters
 from telegram import Update
-from telegram.ext import CallbackContext
+from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 
-# Cargar lista de groserías desde archivo
-with open("badwords.json", "r", encoding="utf-8") as f:
-    BAD_WORDS = set(json.load(f))
+TOKEN = os.getenv("BOT_TOKEN")
 
-def detect_groserias(update: Update, context: CallbackContext):
-    message_text = update.message.text.lower()
-    if any(word in message_text for word in BAD_WORDS):
+if not TOKEN:
+    raise ValueError("BOT_TOKEN no está configurado. Asegúrate de establecer la variable de entorno.")
+
+# Lista extensa de groserías (puedes seguir agregando más)
+GROSERIAS = [
+    "puta", "puto", "mierda", "cabron", "coño", "joder", "pendejo", "marica",
+    "hijueputa", "imbécil", "gilipollas", "carajo", "culiao", "culero", "estupido",
+    "idiota", "baboso", "boludo", "malparido", "perra", "chingada", "chinga", "verga"
+]
+
+async def eliminar_mensaje(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    texto = update.message.text.lower()
+    if any(palabra in texto for palabra in GROSERIAS):
         try:
-            context.bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
-            context.bot.send_message(chat_id=update.message.chat_id,
-                                     text=f"⚠️ Se eliminó un mensaje por contener lenguaje inapropiado.")
+            await update.message.delete()
+            await context.bot.send_message(chat_id=update.effective_chat.id,
+                                           text=f"🚫 El mensaje de @{update.message.from_user.username or update.message.from_user.first_name} fue eliminado por contener lenguaje inapropiado.")
         except Exception as e:
-            print("Error al borrar mensaje:", e)
-
-def main():
-    TOKEN = os.getenv("BOT_TOKEN")
-    updater = Updater(TOKEN, use_context=True)
-    dp = updater.dispatcher
-
-    dp.add_handler(MessageHandler(Filters.text & (~Filters.command), detect_groserias))
-
-    updater.start_polling()
-    updater.idle()
+            print(f"Error al eliminar mensaje: {e}")
 
 if __name__ == "__main__":
-    main()
+    app = ApplicationBuilder().token(TOKEN).build()
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, eliminar_mensaje))
+    print("🤖 Bot Antigroserías iniciado...")
+    app.run_polling()
