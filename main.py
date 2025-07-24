@@ -56,6 +56,10 @@ async def reglas(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def ayuda(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat = update.effective_chat
+    if chat.type not in ["group", "supergroup"]:
+        await update.message.reply_text("❌ Este comando solo funciona dentro de un grupo.")
+        return
+    chat = update.effective_chat
     admins = await context.bot.get_chat_administrators(chat.id)
     mensaje = f"🔔 El usuario @{update.effective_user.username or update.effective_user.first_name} ha solicitado ayuda en el grupo {chat.title}."
 
@@ -68,6 +72,10 @@ async def ayuda(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("✅ Hemos notificado a los administradores. Pronto te contactarán.")
 
 async def staff(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    chat = update.effective_chat
+    if chat.type not in ["group", "supergroup"]:
+        await update.message.reply_text("❌ Este comando solo funciona dentro de un grupo.")
+        return
     chat = update.effective_chat
     admins = await context.bot.get_chat_administrators(chat.id)
     admin_list = "\n".join([f"• {admin.user.first_name} (@{admin.user.username})" if admin.user.username else f"• {admin.user.first_name}" for admin in admins])
