@@ -21,7 +21,7 @@ logging.basicConfig(
 GROSIAS = [
     "puta", "mierda", "cabron", "pendejo", "idiota", "imbecil", "malparido", "chingada",
     "verga", "coño", "joder", "gilipollas", "pelotudo", "culiao", "culero", "estupido", "zorra",
-    "bitch", "fuck", "shit", "asshole", "dick", "bastard", "motherfucker", "slut", "cunt"
+    "bitch", "fuck", "shit", "asshole", "dick", "bastard", "motherfucker", "jetacas", "cunt"
 ]
 
 advertencias = defaultdict(int)
